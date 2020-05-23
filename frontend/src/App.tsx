@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
@@ -72,7 +72,7 @@ function App() {
     return () => clearInterval(interval);
   }, [setData, setError]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const callback = () => {
       if (!scoresRef.current) {
         return;
@@ -86,15 +86,18 @@ function App() {
         return;
       }
 
-      // Calculate how many items we can display. NOTE: this will not shrink
-      // after the page is reloaded, but it calculates the right number and this
-      // will be a static page, so it's good enough for me.
+      // Calculate how many items we can display.
+      //
+      // NOTE: this will not shrink after the page is reloaded, but it
+      // calculates the right number and this will be a static page, so it's
+      // good enough for me.
       const newCount = Math.floor(containerHeight / firstScore.clientHeight);
       if (count !== newCount) {
         setCount(newCount);
       }
 
-      // Set the new offset - reset to the first page if we went past the end.
+      // Set the new offset - reset to the first page if we went past the end of
+      // the list.
       const newOffset = offset + count;
       const finalOffset = newOffset >= data.length ? 0 : newOffset;
       if (finalOffset !== offset) {
