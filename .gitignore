@@ -1,0 +1,6 @@
+.python-version
+*.egg-info
+frontend/node_modules
+frontend/build
+frontend/dist
+leaderboard/media

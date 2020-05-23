@@ -1,0 +1,90 @@
+:root {
+  --target-marquee-width: 200px;
+  --max-marquee-height: 3em;
+  --background-color: #000000;
+  --accent-color: #F40000;
+}
+
+@font-face {
+  font-family: 'bitwise';
+  src: url('fonts/bitwise.eot'); /* IE9 Compat Modes */
+  src: url('fonts/bitwise.eot?#iefix')      format('embedded-opentype'), /* IE6-IE8 */
+       url('fonts/bitwise.woff2')           format('woff2'), /* Super Modern Browsers */
+       url('fonts/bitwise.woff')            format('woff'), /* Pretty Modern Browsers */
+       url('fonts/bitwise.ttf')             format('truetype'), /* Safari, Android, iOS */
+       url('fonts/bitwise.svg#svgFontName') format('svg'); /* Legacy iOS */
+}
+
+body {
+  font-family: "bitwise", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  background-color: var(--background-color);
+  color: var(--accent-color);
+
+  font-size: 20pt;
+}
+
+header {
+  text-align: center;
+}
+
+.App {
+  width: 800px;
+  margin: auto;
+}
+
+.Scores {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 0fr 1fr 0fr;
+  column-gap: 1em;
+}
+
+.Scores hr {
+  color: var(--accent-color);
+}
+
+/*
+ * Make each item a flexbox container so we can properly position
+ * and align things.
+ */
+.Scores .GameName, .Scores.PlayerName, .Scores.Score {
+  display: flex;
+}
+
+/*
+ * We insert hr elements rather than an underline because you can't really
+ * underline css grid items. Because of this we need to force the hr elements to
+ * be the full width of the grid.
+ */
+.Scores hr {
+  grid-column: 1 / 4;
+  width: 100%;
+  margin: 0px;
+}
+
+.Scores .GameName {
+  height: var(--max-marquee-height);
+  width: var(--target-marquee-width);
+
+  align-items: center;
+  align-self: center;
+}
+
+.Scores .GameName img {
+  max-height: var(--max-marquee-height);
+  width: var(--target-marquee-width);
+  height: auto;
+  display: block;
+}
+
+.Scores .PlayerName {
+  text-align: right;
+  align-self: center;
+}
+.Scores .Score {
+  text-align: left;
+  align-self: center;
+}
