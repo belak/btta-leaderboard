@@ -43,22 +43,18 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
-    'corsheaders',
+    "corsheaders",
+    "django_extensions",
     "rest_framework",
     "rest_framework.authtoken",
 ]
 
-LOCAL_APPS = [
-    'leaderboard.scores',
-    'leaderboard.users'
-]
+LOCAL_APPS = ["leaderboard.scores", "leaderboard.users"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 # Authentication
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend"
-]
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
@@ -84,23 +80,20 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    #"django.middleware.locale.LocaleMiddleware",
-    'corsheaders.middleware.CorsMiddleware',
+    # "django.middleware.locale.LocaleMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    #"django.middleware.common.BrokenLinkEmailsMiddleware",
+    # "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 # Static
 STATIC_ROOT = str(ROOT_DIR / "staticfiles")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    str(APPS_DIR / "static"),
-    str(ROOT_DIR / "frontend" / "build")
-]
+STATICFILES_DIRS = [str(APPS_DIR / "static"), str(ROOT_DIR / "frontend" / "build")]
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",

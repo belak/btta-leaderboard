@@ -9,12 +9,14 @@ asgiref==3.2.7            # via django
 cffi==1.14.0              # via argon2-cffi
 django-cors-headers==3.3.0  # via -r requirements.in
 django-environ==0.4.5     # via -r requirements.in
-django==3.0.6             # via -r requirements.in, django-cors-headers, djangorestframework
+django-extensions==2.2.9  # via -r requirements.in
+django-model-utils==4.0.0  # via -r requirements.in
+django==3.0.6             # via -r requirements.in, django-cors-headers, django-model-utils, djangorestframework
 djangorestframework==3.11.0  # via -r requirements.in
 pillow==7.1.2             # via -r requirements.in
 psycopg2==2.8.5           # via -r requirements.in
 pycparser==2.20           # via cffi
 pytz==2020.1              # via django
-six==1.15.0               # via argon2-cffi
+six==1.15.0               # via argon2-cffi, django-extensions
 sqlparse==0.3.1           # via django
 whitenoise==5.0.1         # via -r requirements.in
