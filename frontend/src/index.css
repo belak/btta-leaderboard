@@ -58,27 +58,6 @@ header {
   column-gap: 1em;
   /* background-color: #ff00ff; */
   height: 100%;
-
-  animation: fadeIn ease 0.5s;
-  animation: fadeOut ease 0.5s;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity:0;
-  }
-  100% {
-    opacity:1;
-  }
-}
-
-@keyframes fadeOut {
-  0% {
-    opacity:1;
-  }
-  100% {
-    opacity:0;
-  }
 }
 
 /*
