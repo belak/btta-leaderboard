@@ -98,7 +98,10 @@ header img {
   color: white;
   height: 1px;
   background: var(--line-color);
-  background: radial-gradient(var(--line-color) 0%, var(--background-color) 75%);
+  background: radial-gradient(
+    var(--line-color) 0%,
+    var(--background-color) 75%
+  );
 }
 
 .scores {
@@ -107,7 +110,6 @@ header img {
 
 .scores .newScore {
   color: var(--accent-color);
-
 }
 
 .scores .gameName {
@@ -132,4 +134,44 @@ header img {
 .scores .score {
   justify-self: right;
   align-self: center;
+}
+
+/*
+ * Overrides for small screens
+ */
+@media (max-width: 1000px) {
+  header img {
+    width: 90%;
+  }
+
+  .App {
+    width: 100%;
+  }
+
+  .scores {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr;
+  }
+
+  .scores .line {
+    grid-column: 1;
+  }
+
+  .scores .gameName,
+  .scores .playerName,
+  .scores .score {
+    justify-self: center;
+    align-self: center;
+  }
+
+  .scores .gameName {
+    height: inherit;
+    width: 100%;
+  }
+
+  .scores .gameName img {
+    margin: auto;
+    width: 90%;
+    max-height: 500px;
+  }
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 
 import Leaderboard from "./Leaderboard";
+import { useLocalStorage } from "./utils";
 
 type FormData = {
   url: string;
@@ -12,11 +13,17 @@ function App() {
 
   // If an error occured
   const [error, setError] = useState<string | null>(null);
-  const [url, setUrl] = useState<string | null>(null);
+  const [connected, setConnected] = useState(false);
+  const [url, setUrl] = useLocalStorage(
+    "leaderboardUrl",
+    "https://btta-api.elwert.cloud"
+  );
 
   const onSubmit = useCallback(
     handleSubmit(async (values: FormData) => {
       localStorage.leaderboardUrl = values.url;
+
+      setConnected(true);
 
       fetch(`${values.url}/api/scores/`)
         .then((resp) => {
@@ -32,28 +39,26 @@ function App() {
           setError(`Connection error: ${e}`);
         });
     }),
-    [handleSubmit, setUrl]
+    [handleSubmit, setUrl, setConnected]
   );
 
   const disconnect = useCallback(() => {
-    setUrl(null);
-    if (url) {
-      // We need to do this on the next animation frame rather than now so the
-      // form elements will exist.
-      window.requestAnimationFrame(() => {
-        setValue("url", url);
-      });
-    }
-  }, [setUrl, setValue, url]);
+    setConnected(false);
 
+    // We need to do this on the next animation frame rather than now so the
+    // form elements will exist.
+    window.requestAnimationFrame(() => {
+      setValue("url", url);
+    });
+  }, [setConnected, setValue, url]);
+
+  // On startup, if there's a provided URL, mark us as connected.
   useEffect(() => {
-    const url = localStorage.leaderboardUrl || "";
-    setValue("url", url);
-
     if (url) {
-      setUrl(url)
+      setConnected(true);
     }
-  }, [setValue, setUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const ret = (
     <div className="App">
@@ -73,7 +78,7 @@ function App() {
         </div>
       )}
 
-      {url ? (
+      {connected ? (
         <Leaderboard baseURL={url} setError={setError} />
       ) : (
         <>

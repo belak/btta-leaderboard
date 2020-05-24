@@ -1,4 +1,10 @@
-import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
@@ -105,15 +111,25 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     };
   }, [nextPage]);
 
-  // When the window size changes, reset it to displaying 1 so we can properly
-  // figure out how many items to display.
+  // When the window size changes if we're not on mobile, reset it to displaying
+  // 1 so we can properly figure out how many items to display.
   const windowSize = useWindowSize();
   useLayoutEffect(() => {
-    setCount(1);
-  }, [windowSize, setCount])
+    if (windowSize.width && windowSize.width > 1000) {
+      setCount(1);
+    }
+  }, [windowSize, setCount]);
 
   useLayoutEffect(() => {
     if (!scoresRef.current) {
+      return;
+    }
+
+    const width = windowSize.width || 0;
+
+    // If we're on mobile, just display everything
+    if (width < 1000) {
+      setCount(data.length);
       return;
     }
 
