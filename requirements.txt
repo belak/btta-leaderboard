@@ -19,6 +19,7 @@ psycopg2==2.8.5           # via -r requirements.in
 pycparser==2.20           # via cffi
 pytz==2020.1              # via django
 six==1.15.0               # via argon2-cffi, django-extensions
+sorl-thumbnail==12.6.3    # via -r requirements.in
 sqlparse==0.3.1           # via django
 whitenoise==5.0.1         # via -r requirements.in
 

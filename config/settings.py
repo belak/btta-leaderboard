@@ -21,6 +21,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+APPEND_SLASH = False
 
 
 # Databases
@@ -28,6 +29,12 @@ DATABASES = {
     "default": env.db("DATABASE_URL"),
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+
+# Caches
+CACHES = {
+    "default": env.cache("CACHE_URL", default="locmemcache://")
+}
 
 
 # URLs
@@ -52,6 +59,7 @@ THIRD_PARTY_APPS = [
     "django_extensions",
     "rest_framework",
     "rest_framework.authtoken",
+    "sorl.thumbnail",
 ]
 
 LOCAL_APPS = ["leaderboard.scores", "leaderboard.users"]
@@ -139,6 +147,7 @@ CSRF_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 
+
 # Email
 
 # TODO: move this to not the console backend
@@ -146,10 +155,12 @@ EMAIL_BACKEND = env(
     "DJANGO_EMAIL_BACKEND", default="django.core.mail.backends.console.EmailBackend"
 )
 
+
 # Admin
 ADMIN_URL = "admin/"
 ADMINS = [("""Kaleb Elwert""", "belak@coded.io")]
 MANAGERS = ADMINS
+
 
 # Logging
 LOGGING = {
@@ -171,6 +182,11 @@ LOGGING = {
     "root": {"level": "INFO", "handlers": ["console"]},
 }
 
+
+# Thumbnails
+THUMBNAIL_FORMAT = 'PNG'
+THUMBNAIL_UPSCALE = False
+
 # Rest Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -178,6 +194,8 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
+
+
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL = True

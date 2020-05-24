@@ -1,8 +1,7 @@
-from django.db import models
-from model_utils.models import TimeStampedModel
+from leaderboard.util import models
 
 
-class Score(TimeStampedModel, models.Model):
+class Score(models.TimeStampedModel, models.Model):
     game_banner = models.ImageField()
     game_name = models.CharField(max_length=255)
     player_name = models.CharField(max_length=255)

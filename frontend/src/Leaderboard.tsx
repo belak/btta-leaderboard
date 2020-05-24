@@ -42,7 +42,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
 
   const fetchNewScores = useCallback(async () => {
     try {
-      const resp = await fetch(`${baseURL}/api/scores`);
+      const resp = await fetch(`${baseURL}/api/scores/`);
       if (resp.status === 200) {
         const data = camelcaseKeys(await resp.json(), {
           deep: true,

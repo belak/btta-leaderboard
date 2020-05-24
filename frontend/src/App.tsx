@@ -18,7 +18,7 @@ function App() {
     handleSubmit(async (values: FormData) => {
       localStorage.leaderboardUrl = values.url;
 
-      fetch(`${values.url}/api/scores`)
+      fetch(`${values.url}/api/scores/`)
         .then((resp) => {
           // On successful connection, mark us as connected.
           if (resp.status === 200) {
