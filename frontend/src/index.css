@@ -1,6 +1,6 @@
 :root {
-  --target-marquee-width: 200px;
-  --max-marquee-height: 3em;
+  --target-marquee-width: 300px;
+  --max-marquee-height: 2.5em;
   --background-color: #000000;
   --foreground-color: #f14402;
   --accent-color: #fabc04;
@@ -37,10 +37,20 @@ body {
 
 header {
   text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+  padding-bottom: 1em;
+}
+
+header img {
+  vertical-align: middle;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  width: 450px;
 }
 
 .App {
-  width: 800px;
+  width: 1000px;
   margin: auto;
   min-height: 100vh;
   display: flex;
@@ -58,6 +68,8 @@ header {
   column-gap: 1em;
   /* background-color: #ff00ff; */
   height: 100%;
+
+  font-size: 35pt;
 }
 
 /*

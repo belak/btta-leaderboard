@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
+
+import { useInterval } from "./utils";
 
 type ScoreResponse = {
   id: number;
@@ -34,86 +36,83 @@ function App() {
 
   const scoresRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const callback = async () => {
-      try {
-        const resp = await fetch("http://localhost:8000/api/scores");
-        if (resp.status === 200) {
-          const data = camelcaseKeys(await resp.json(), {
-            deep: true,
-          }) as ScoreResponse[];
+  const fetchNewScores = useCallback(async () => {
+    try {
+      const resp = await fetch("http://localhost:8000/api/scores");
+      if (resp.status === 200) {
+        const data = camelcaseKeys(await resp.json(), {
+          deep: true,
+        }) as ScoreResponse[];
 
-          // Any score modified than a day ago should be counted as new
-          setData(
-            data.map((item) => ({
-              ...item,
-              newScore:
-                differenceInSeconds(new Date(), parseISO(item.modified)) <
-                3600 * 24,
-            }))
-          );
+        // Any score modified than a day ago should be counted as new
+        setData(
+          data.map((item) => ({
+            ...item,
+            newScore:
+              differenceInSeconds(new Date(), parseISO(item.modified)) <
+              3600 * 24 * 30,
+          }))
+        );
 
-          // Now that we had a successful request, clear any existing errors.
-          setError(null);
-        } else {
-          const text = await resp.text();
-          setError("Failed to get scores: " + text);
-        }
-      } catch (e) {
-        setError("Failed to get scores: " + e);
+        // Now that we had a successful request, clear any existing errors.
+        setError(null);
+      } else {
+        const text = await resp.text();
+        setError("Failed to get scores: " + text);
       }
-    };
-
-    // Kick off the callback once so we don't need to wait 5 seconds for
-    // results.
-    callback();
-
-    const interval = setInterval(callback, 5000);
-    return () => clearInterval(interval);
+    } catch (e) {
+      setError("Failed to get scores: " + e);
+    }
   }, [setData, setError]);
 
+  // Fetch new scores every 5 seconds
+  useInterval(fetchNewScores, 3000);
+
+  // Call fetchNewScores on the page load
   useEffect(() => {
-    const callback = () => {
-      if (!scoresRef.current) {
-        return;
-      }
+    fetchNewScores();
+  }, [fetchNewScores]);
 
-      const containerHeight = scoresRef.current.clientHeight;
+  const nextPage = useCallback(() => {
+    const newOffset = offset + count;
+    const finalOffset = newOffset >= data.length ? 0 : newOffset;
+    if (finalOffset !== offset) {
+      setOffset(finalOffset);
+    }
+  }, [offset, count, data, setOffset]);
 
-      const firstScore = scoresRef.current.firstChild
-        ?.firstChild as HTMLSpanElement | null;
-      if (!firstScore) {
-        return;
-      }
+  // Jump to the next page every 1 seconds
+  useInterval(nextPage, 5000);
 
-      // Calculate how many items we can display.
-      //
-      // NOTE: this will not shrink after the page is reloaded, but it
-      // calculates the right number and this will be a static page, so it's
-      // good enough for me.
-      const newCount = Math.floor(containerHeight / firstScore.clientHeight);
-      if (count !== newCount) {
-        setCount(newCount);
-      }
+  useEffect(() => {
+    if (!scoresRef.current) {
+      return;
+    }
 
-      // Set the new offset - reset to the first page if we went past the end of
-      // the list.
-      const newOffset = offset + count;
-      const finalOffset = newOffset >= data.length ? 0 : newOffset;
-      if (finalOffset !== offset) {
-        setOffset(finalOffset);
-      }
-    };
+    const containerHeight = scoresRef.current.clientHeight;
 
-    const interval = setInterval(callback, 1000);
-    return () => clearInterval(interval);
-  }, [data, count, offset, setOffset, setCount, scoresRef]);
+    const firstScore = scoresRef.current.firstChild
+      ?.firstChild as HTMLSpanElement | null;
+    if (!firstScore) {
+      return;
+    }
+
+    // Calculate how many items we can display.
+    //
+    // NOTE: this will not shrink after the page is reloaded, but it
+    // calculates the right number and this will be a static page, so it's
+    // good enough for me.
+    const newCount = Math.floor(containerHeight / firstScore.clientHeight);
+    if (count !== newCount) {
+      setCount(newCount);
+    }
+  }, [count, setCount, scoresRef, data]);
 
   const ret = (
     <div className="App">
       <header>
-        <img src="logo.png" alt="Back to the Arcade" width="500px" />
-        <h2>Leaderboard</h2>
+        <img className="logo" src="logo.png" alt="Back to the Arcade" />
+        <img className="leaderboard" src="leaderboard-text.png" alt="Leaderboard" />
       </header>
 
       {error && (
@@ -123,10 +122,7 @@ function App() {
         </div>
       )}
 
-      <div
-        className="scoresContainer"
-        ref={scoresRef}
-      >
+      <div className="scoresContainer" ref={scoresRef}>
         <div className="scores">
           {data.slice(offset, offset + count).map((item, idx) => {
             return (
