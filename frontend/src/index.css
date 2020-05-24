@@ -128,7 +128,7 @@ header img {
 }
 
 .scores .playerName {
-  justify-self: right;
+  justify-self: center;
   align-self: center;
 }
 .scores .score {

@@ -27,5 +27,5 @@ RUN DJANGO_SECRET_KEY=assetbuild DATABASE_URL=sqlite://:memory: python manage.py
 
 VOLUME /data
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "--workers=4", "config.wsgi:application"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "--workers=4", "--threads=4", "--worker-tmp-dir=/dev/shm", "--worker-class=gthread", "--log-file=-", "config.wsgi:application"]
 EXPOSE 8000
