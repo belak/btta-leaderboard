@@ -58,7 +58,7 @@ function App() {
       setConnected(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const ret = (
     <div className="App">
@@ -86,6 +86,10 @@ function App() {
           <button onClick={onSubmit}>Connect</button>
         </>
       )}
+
+      <footer>
+        <img src="pacman-ghosts.jpg" alt="" />
+      </footer>
     </div>
   );
 

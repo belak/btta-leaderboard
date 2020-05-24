@@ -50,6 +50,19 @@ header img {
   width: 450px;
 }
 
+footer {
+  text-align: center;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+footer img {
+  vertical-align: middle;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  width: 85%;
+}
+
 .App {
   width: 1000px;
   margin: auto;
