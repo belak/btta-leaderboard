@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import environ
@@ -7,7 +8,8 @@ ROOT_DIR = Path(__file__).resolve(strict=True).parent.parent
 APPS_DIR = ROOT_DIR / "leaderboard"
 
 env = environ.Env()
-env.read_env(str(ROOT_DIR / ".env"))
+if os.path.exists(str(ROOT_DIR / ".env")):
+    env.read_env(str(ROOT_DIR / ".env"))
 
 
 # General Settings
@@ -26,9 +28,11 @@ DATABASES = {
 }
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
+
 # URLs
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
+
 
 # Apps
 DJANGO_APPS = [
@@ -53,6 +57,7 @@ LOCAL_APPS = ["leaderboard.scores", "leaderboard.users"]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
+
 # Authentication
 AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 AUTH_USER_MODEL = "users.User"
@@ -75,6 +80,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
+
 # Middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -90,18 +96,21 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 # Static
-STATIC_ROOT = str(ROOT_DIR / "staticfiles")
+STATIC_ROOT = str(ROOT_DIR / "static")
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [str(APPS_DIR / "static"), str(ROOT_DIR / "frontend" / "build")]
+#STATICFILES_DIRS = [str(APPS_DIR / "static"), str(ROOT_DIR / "frontend" / "build")]
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
+
 # Media
-MEDIA_ROOT = str(APPS_DIR / "media")
+MEDIA_ROOT = env('MEDIA_ROOT', default=str(APPS_DIR / "media"))
 MEDIA_URL = "/media/"
+
 
 # Templates
 TEMPLATES = [
