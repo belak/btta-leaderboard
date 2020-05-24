@@ -73,6 +73,7 @@ AUTH_USER_MODEL = "users.User"
 LOGIN_REDIRECT_URL = "users:redirect"
 LOGIN_URL = "account_login"
 
+
 # Passwords
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",
@@ -119,6 +120,7 @@ STATICFILES_FINDERS = [
 # Media
 MEDIA_ROOT = env('MEDIA_ROOT', default=str(APPS_DIR / "media"))
 MEDIA_URL = env('MEDIA_URL', default="/media/")
+MEDIA_PATH = "/media/"
 
 
 # Templates
@@ -140,6 +142,7 @@ TEMPLATES = [
         },
     }
 ]
+
 
 # Security
 SESSION_COOKIE_HTTPONLY = True
@@ -186,6 +189,8 @@ LOGGING = {
 # Thumbnails
 THUMBNAIL_FORMAT = 'PNG'
 THUMBNAIL_UPSCALE = False
+THUMBNAIL_ALTERNATIVE_RESOLUTIONS = [2]
+
 
 # Rest Framework
 REST_FRAMEWORK = {
@@ -194,7 +199,6 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
 }
-
 
 
 # CORS

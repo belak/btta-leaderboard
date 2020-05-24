@@ -10,6 +10,7 @@ import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
 import Mousetrap from "mousetrap";
 
+import RetinaImage from './RetinaImage'
 import { useInterval, useWindowSize } from "./utils";
 
 type ScoreResponse = {
@@ -164,7 +165,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
                   newScore: item.newScore,
                 })}
               >
-                <img src={item.gameBannerThumbnail} alt={item.gameName} />
+                <RetinaImage src={item.gameBannerThumbnail} alt={item.gameName} />
               </span>
               <span
                 className={cx("playerName", {

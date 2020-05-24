@@ -8,4 +8,4 @@ urlpatterns = [
     path("api/", include("config.api_router")),
     path("auth-token/", obtain_auth_token),
     path("admin/", admin.site.urls),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_PATH, document_root=settings.MEDIA_ROOT)
