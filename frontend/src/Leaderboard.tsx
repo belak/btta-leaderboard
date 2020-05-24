@@ -161,12 +161,9 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
       return;
     }
 
-    // Calculate how many items we can display.
-    //
-    // NOTE: this will not shrink after the page is reloaded, but it
-    // calculates the right number and this will be a static page, so it's
-    // good enough for me.
-    const newCount = Math.floor(containerHeight / firstScore.clientHeight);
+    // Calculate how many items we can display. Note that the extra plus one
+    // accounts for the line between rows.
+    const newCount = Math.floor(containerHeight / (firstScore.clientHeight + 1));
     if (count !== newCount) {
       setCount(newCount);
     }
