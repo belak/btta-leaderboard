@@ -51,9 +51,9 @@ function App() {
     setValue("url", url);
 
     if (url) {
-      onSubmit();
+      setUrl(url)
     }
-  }, [setValue, onSubmit]);
+  }, [setValue, setUrl]);
 
   const ret = (
     <div className="App">

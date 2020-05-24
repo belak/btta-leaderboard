@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
+import Mousetrap from 'mousetrap';
 
 import { useInterval } from "./utils";
 
@@ -86,6 +87,18 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
 
   // Jump to the next page every 10 seconds
   useInterval(nextPage, 10000);
+
+  useEffect(() => {
+    Mousetrap.bind('space', nextPage);
+    Mousetrap.bind('enter', nextPage);
+    Mousetrap.bind('right', nextPage);
+
+    return () => {
+      Mousetrap.unbind('space');
+      Mousetrap.unbind('enter');
+      Mousetrap.unbind('right');
+    }
+  }, [nextPage])
 
   useEffect(() => {
     if (!scoresRef.current) {
