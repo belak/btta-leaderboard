@@ -10,8 +10,19 @@ import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
 import Mousetrap from "mousetrap";
 
-import RetinaImage from './RetinaImage'
-import { useInterval, useWindowSize } from "./utils";
+import { useInterval, useWindowSize, isHiDpi } from "./utils";
+
+const buildImageUrl = (url: string): string => {
+  if (!isHiDpi()) {
+    return url;
+  }
+
+  const split = url.split(".");
+  const ext = split.pop();
+  const baseName = split.join(".");
+
+  return ext ? `${baseName}@2x.${ext}` : url;
+};
 
 type ScoreResponse = {
   id: number;
@@ -57,21 +68,29 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
           deep: true,
         }) as ScoreResponse[];
 
+        const newData = data.map((item) => ({
+          ...item,
+          newScore: Math.random() >= 0.8,
+          gameBannerThumbnail: buildImageUrl(item.gameBannerThumbnail),
+          /*
+          newScore:
+            differenceInSeconds(new Date(), parseISO(item.modified)) <
+            3600 * 24 * 30,
+          */
+        }));
+
         // Any score modified than a day ago should be counted as new.
-        setData(
-          data.map((item) => ({
-            ...item,
-            newScore: Math.random() >= 0.8,
-            /*
-            newScore:
-              differenceInSeconds(new Date(), parseISO(item.modified)) <
-              3600 * 24 * 30,
-            */
-          }))
-        );
+        setData(newData);
 
         // Now that we had a successful request, clear any existing errors.
         setError(null);
+
+        // Preload all images
+        newData.map(({ gameBannerThumbnail: src }) => {
+          let image = new Image();
+          image.src = src;
+          return image;
+        });
       } else {
         const text = await resp.text();
         setError("Failed to get scores: " + text);
@@ -165,7 +184,10 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
                   newScore: item.newScore,
                 })}
               >
-                <RetinaImage src={item.gameBannerThumbnail} alt={item.gameName} />
+                <img
+                  src={item.gameBannerThumbnail}
+                  alt={item.gameName}
+                />
               </span>
               <span
                 className={cx("playerName", {
