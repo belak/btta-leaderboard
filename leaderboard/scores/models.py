@@ -15,5 +15,6 @@ class Score(models.TimeStampedModel, models.Model):
     def __str__(self):
         return self.game_name
 
-    def game_banner_thumbnail(self, obj):
-        return get_thumbnail(obj.game_banner, "300").url
+    @property
+    def game_banner_thumbnail(self):
+        return get_thumbnail(self.game_banner, "300").url
