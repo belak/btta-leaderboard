@@ -14,3 +14,6 @@ argon2-cffi<19.3
 
 # Libraries for communicating with external dependencies.
 psycopg2<2.9
+
+# Production webserver
+gunicorn<21
