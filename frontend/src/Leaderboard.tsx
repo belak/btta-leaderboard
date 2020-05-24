@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useCallback } from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
-import Mousetrap from 'mousetrap';
+import Mousetrap from "mousetrap";
 
 import { useInterval } from "./utils";
 
@@ -10,6 +10,7 @@ type ScoreResponse = {
   id: number;
   gameName: string;
   gameBanner: string;
+  gameBannerThumbnail: string;
   playerName: string;
   playerScore: number;
   created: string;
@@ -20,6 +21,7 @@ type Score = {
   id: number;
   gameName: string;
   gameBanner: string;
+  gameBannerThumbnail: string;
   playerName: string;
   playerScore: number;
   newScore: boolean;
@@ -89,16 +91,16 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   useInterval(nextPage, 10000);
 
   useEffect(() => {
-    Mousetrap.bind('space', nextPage);
-    Mousetrap.bind('enter', nextPage);
-    Mousetrap.bind('right', nextPage);
+    Mousetrap.bind("space", nextPage);
+    Mousetrap.bind("enter", nextPage);
+    Mousetrap.bind("right", nextPage);
 
     return () => {
-      Mousetrap.unbind('space');
-      Mousetrap.unbind('enter');
-      Mousetrap.unbind('right');
-    }
-  }, [nextPage])
+      Mousetrap.unbind("space");
+      Mousetrap.unbind("enter");
+      Mousetrap.unbind("right");
+    };
+  }, [nextPage]);
 
   useEffect(() => {
     if (!scoresRef.current) {
@@ -136,7 +138,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
                   newScore: item.newScore,
                 })}
               >
-                <img src={item.gameBanner} alt={item.gameName} />
+                <img src={item.gameBannerThumbnail} alt={item.gameName} />
               </span>
               <span
                 className={cx("playerName", {
