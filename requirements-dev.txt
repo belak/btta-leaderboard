@@ -29,4 +29,5 @@ six==1.15.0               # via -c requirements.txt, astroid, packaging
 toml==0.10.1              # via black, pylint
 typed-ast==1.4.1          # via black
 wcwidth==0.1.9            # via pytest
+werkzeug==1.0.1           # via -r requirements-dev.in
 wrapt==1.12.1             # via astroid

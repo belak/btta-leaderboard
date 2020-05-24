@@ -1,6 +1,6 @@
 import React from "react";
 
-import { isRetina } from "./utils";
+import { isHiDpi } from "./utils";
 
 type RetinaImageProps = {
   alt: string;
@@ -13,7 +13,7 @@ function RetinaImage({ alt, src }: RetinaImageProps) {
   const baseName = split.join('.');
 
   let imgSrc = src;
-  if (ext && isRetina()) {
+  if (ext && isHiDpi()) {
     imgSrc = `${baseName}@2x.${ext}`
   }
 
