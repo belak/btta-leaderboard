@@ -21,7 +21,11 @@ RUN apt-get update \
 
 ADD . /code/
 
+ENV MEDIA_ROOT /data/media
+
 RUN DJANGO_SECRET_KEY=assetbuild DATABASE_URL=sqlite://:memory: python manage.py collectstatic
+
+VOLUME /data
 
 CMD ["gunicorn", "-b", "0.0.0.0:8000", "config.wsgi:application"]
 EXPOSE 8000
