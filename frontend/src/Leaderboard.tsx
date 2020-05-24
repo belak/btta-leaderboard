@@ -66,7 +66,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     } catch (e) {
       setError("Failed to get scores: " + e);
     }
-  }, [setData, setError]);
+  }, [baseURL, setData, setError]);
 
   // Fetch new scores every 30 seconds
   useInterval(fetchNewScores, 30000);
