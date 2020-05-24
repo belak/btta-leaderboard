@@ -1,10 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useLayoutEffect, useState, useRef, useCallback } from "react";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
 import Mousetrap from "mousetrap";
 
-import { useInterval } from "./utils";
+import { useInterval, useWindowSize } from "./utils";
 
 type ScoreResponse = {
   id: number;
@@ -54,9 +54,12 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
         setData(
           data.map((item) => ({
             ...item,
+            newScore: Math.random() >= 0.8,
+            /*
             newScore:
               differenceInSeconds(new Date(), parseISO(item.modified)) <
               3600 * 24 * 30,
+            */
           }))
         );
 
@@ -102,7 +105,14 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     };
   }, [nextPage]);
 
-  useEffect(() => {
+  // When the window size changes, reset it to displaying 1 so we can properly
+  // figure out how many items to display.
+  const windowSize = useWindowSize();
+  useLayoutEffect(() => {
+    setCount(1);
+  }, [windowSize, setCount])
+
+  useLayoutEffect(() => {
     if (!scoresRef.current) {
       return;
     }
@@ -124,7 +134,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     if (count !== newCount) {
       setCount(newCount);
     }
-  }, [count, setCount, scoresRef, data]);
+  }, [count, setCount, scoresRef, data, windowSize]);
 
   return (
     <div className="scoresContainer" ref={scoresRef}>

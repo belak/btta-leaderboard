@@ -2,7 +2,8 @@
   --target-marquee-width: 300px;
   --max-marquee-height: 2.5em;
   --background-color: #000000;
-  --foreground-color: #f14402;
+  --foreground-color: #f10202;
+  --line-color: #a09e9d;
   --accent-color: #fabc04;
 
   /* Colors from BTTA logo */
@@ -96,12 +97,17 @@ header img {
   border: none;
   color: white;
   height: 1px;
-  background: var(--foreground-color);
-  background: radial-gradient(var(--foreground-color) 0%, var(--background-color) 75%);
+  background: var(--line-color);
+  background: radial-gradient(var(--line-color) 0%, var(--background-color) 75%);
+}
+
+.scores {
+  color: var(--foreground-color);
 }
 
 .scores .newScore {
   color: var(--accent-color);
+
 }
 
 .scores .gameName {
