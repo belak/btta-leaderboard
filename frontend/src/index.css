@@ -97,15 +97,7 @@ header img {
   color: white;
   height: 1px;
   background: var(--foreground-color);
-  background: -webkit-gradient(
-    radial,
-    50% 50%,
-    0,
-    50% 50%,
-    350,
-    from(var(--foreground-color)),
-    to(var(--background-color))
-  );
+  background: radial-gradient(var(--foreground-color) 0%, var(--background-color) 75%);
 }
 
 .scores .newScore {
