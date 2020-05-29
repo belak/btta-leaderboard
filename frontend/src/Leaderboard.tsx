@@ -57,10 +57,12 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   const [count, setCount] = useState(1);
   // All score data
   const [data, setData] = useState<Score[]>([]);
+  // Refresh is disabled on mobile
+  const [refreshEnabled, setRefreshEnabled] = useState(false);
 
   const scoresRef = useRef<HTMLDivElement>(null);
 
-  const fetchNewScores = useCallback(async () => {
+  const refreshScores = useCallback(async () => {
     try {
       const resp = await fetch(`${baseURL}/api/scores/`);
       if (resp.status === 200) {
@@ -68,16 +70,20 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
           deep: true,
         }) as ScoreResponse[];
 
-        const newData = data.map((item) => ({
-          ...item,
-          newScore: Math.random() >= 0.8,
-          gameBannerThumbnail: buildImageUrl(item.gameBannerThumbnail),
-          /*
-          newScore:
-            differenceInSeconds(new Date(), parseISO(item.modified)) <
-            3600 * 24 * 30,
-          */
-        }));
+        const cur = new Date();
+
+        const newData = data.map((item) => {
+          const modified = parseISO(item.modified);
+          const created = parseISO(item.created);
+
+          const newScore = modified > created && differenceInSeconds(cur, modified) < 3600 * 24 * 30;
+          return {
+            ...item,
+            //newScore: Math.random() >= 0.8,
+            gameBannerThumbnail: buildImageUrl(item.gameBannerThumbnail),
+            newScore,
+          };
+        });
 
         // Any score modified than a day ago should be counted as new.
         setData(newData);
@@ -100,13 +106,23 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     }
   }, [baseURL, setData, setError]);
 
+  const refreshScoresWrapped = useCallback(() => {
+    // Unfortunately, the simplest way to handle disabling refreshing is to
+    // still tick, but not do anything.
+    if (!refreshEnabled) {
+      return;
+    }
+
+    refreshScores();
+  }, [refreshEnabled, refreshScores]);
+
   // Fetch new scores every 30 seconds
-  useInterval(fetchNewScores, 30000);
+  useInterval(refreshScoresWrapped, 30000);
 
   // Call fetchNewScores on the page load
   useEffect(() => {
-    fetchNewScores();
-  }, [fetchNewScores]);
+    refreshScores();
+  }, [refreshScores]);
 
   const nextPage = useCallback(() => {
     const newOffset = offset + count;
@@ -116,8 +132,8 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     }
   }, [offset, count, data, setOffset]);
 
-  // Jump to the next page every 10 seconds
-  useInterval(nextPage, 10000);
+  // Jump to the next page every 9 seconds
+  useInterval(nextPage, 9000);
 
   useEffect(() => {
     Mousetrap.bind("space", nextPage);
@@ -137,8 +153,12 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   useLayoutEffect(() => {
     if (windowSize.width && windowSize.width > 1000) {
       setCount(1);
+      setRefreshEnabled(true);
+    } else {
+      // On mobile, disable the refresh.
+      setRefreshEnabled(false);
     }
-  }, [windowSize, setCount]);
+  }, [windowSize, setCount, setRefreshEnabled]);
 
   useLayoutEffect(() => {
     if (!scoresRef.current) {
@@ -163,7 +183,9 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
 
     // Calculate how many items we can display. Note that the extra plus one
     // accounts for the line between rows.
-    const newCount = Math.floor(containerHeight / (firstScore.clientHeight + 1));
+    const newCount = Math.floor(
+      containerHeight / (firstScore.clientHeight + 1)
+    );
     if (count !== newCount) {
       setCount(newCount);
     }
@@ -181,10 +203,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
                   newScore: item.newScore,
                 })}
               >
-                <img
-                  src={item.gameBannerThumbnail}
-                  alt={item.gameName}
-                />
+                <img src={item.gameBannerThumbnail} alt={item.gameName} />
               </span>
               <span
                 className={cx("playerName", {

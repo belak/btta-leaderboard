@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 
 const useInterval = (fn: () => void, milliseconds: number) => {
+  // NOTE: we use useRef here over useState for a few reasons - we don't want to
+  // stop the ticking if the callback changes.
   const callback = useRef(fn);
 
   // if the provided function changes, call it once and change its reference.

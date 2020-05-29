@@ -1,6 +1,6 @@
 :root {
-  --target-marquee-width: 300px;
-  --max-marquee-height: 2.5em;
+  --target-marquee-width: 275px;
+  --max-marquee-height: 2em;
   --background-color: #000000;
   --foreground-color: #f10202;
   --line-color: #a09e9d;
@@ -60,7 +60,7 @@ footer img {
   vertical-align: middle;
   margin-left: 0.5em;
   margin-right: 0.5em;
-  width: 85%;
+  width: 60%;
 }
 
 .App {
