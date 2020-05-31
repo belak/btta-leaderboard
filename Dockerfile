@@ -1,31 +1,23 @@
-FROM python:3.8-slim
+# Stage 1: Build the application
+FROM golang:1.14-buster as builder
 
-WORKDIR /code/
+RUN mkdir /build
 
-# Magic python environment variables
-ENV PYTHONUNBUFFERED=1 \
-  PYTHONDONTWRITEBYTECODE=1 \
-  PYTHONHASHSEED=random \
-  PIP_NO_CACHE_DIR=off \
-  PIP_DISABLE_PIP_VERSION_CHECK=on
+WORKDIR /btta
+ADD ./go.mod ./go.sum ./
+RUN go mod download
 
-ADD requirements.txt requirements-dev.txt /code/
+ADD . ./
+RUN go build -v -o /build/btta-leaderboard ./cmd/btta-leaderboard
 
-RUN apt-get update \
-    && apt-get install -y build-essential libpq5 libpq-dev \
-    && pip install pip-tools \
-    && pip-sync requirements.txt requirements-dev.txt \
-    && apt-get remove -y --purge build-essential libpq-dev \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
+# Stage 2: Copy files and configure what we need
+FROM debian:buster-slim
 
-ADD . /code/
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-ENV MEDIA_ROOT /data/media
+# Copy the built seabird into the container
+COPY --from=builder /build /bin
 
-RUN DJANGO_SECRET_KEY=assetbuild DATABASE_URL=sqlite://:memory: python manage.py collectstatic
-
-VOLUME /data
-
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "--workers=4", "--threads=4", "--worker-tmp-dir=/dev/shm", "--worker-class=gthread", "--log-file=-", "config.wsgi:application"]
 EXPOSE 8000
+
+ENTRYPOINT ["/bin/btta-leaderboard"]

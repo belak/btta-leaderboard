@@ -1,7 +1,0 @@
--c requirements.txt
-
-werkzeug
-pytest<5.3
-black==19.10b0
-pylint
-flake8
