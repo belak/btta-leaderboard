@@ -62,7 +62,11 @@ THIRD_PARTY_APPS = [
     "sorl.thumbnail",
 ]
 
-LOCAL_APPS = ["leaderboard.scores", "leaderboard.users"]
+LOCAL_APPS = [
+    "leaderboard.images",
+    "leaderboard.scores",
+    "leaderboard.users",
+]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
