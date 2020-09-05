@@ -5,13 +5,10 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import { FlapDisplay, Presets } from "react-split-flap-effect";
 import camelcaseKeys from "camelcase-keys";
 import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
 import Mousetrap from "mousetrap";
-
-import "react-split-flap-effect/extras/themes.css";
 
 import { useInterval, useWindowSize, isHiDpi } from "./utils";
 
@@ -79,9 +76,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
           const modified = parseISO(item.modified);
           const created = parseISO(item.created);
 
-          const newScore =
-            modified > created &&
-            differenceInSeconds(cur, modified) < 3600 * 24 * 30;
+          const newScore = modified > created && differenceInSeconds(cur, modified) < 3600 * 24 * 30;
           return {
             ...item,
             //newScore: Math.random() >= 0.8,
@@ -138,7 +133,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   }, [offset, count, data, setOffset]);
 
   // Jump to the next page every 9 seconds
-  useInterval(nextPage, 15000);
+  useInterval(nextPage, 9000);
 
   useEffect(() => {
     Mousetrap.bind("space", nextPage);
@@ -201,7 +196,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
       <div className="scores">
         {data.slice(offset, offset + count).map((item, idx) => {
           return (
-            <React.Fragment key={idx}>
+            <React.Fragment key={item.id}>
               {idx !== 0 && <span className="line" />}
               <span
                 className={cx("gameName", {
@@ -215,21 +210,14 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
                   newScore: item.newScore,
                 })}
               >
-                <FlapDisplay
-                  className={cx("darkBordered", "L")}
-                  chars={Presets.ALPHANUM + ",.!?"}
-                  length={12}
-                  value={item.playerName}
-                  timing={30}
-                />
-
-                <FlapDisplay
-                  className={cx("darkBordered", "L")}
-                  chars={Presets.NUM + ","}
-                  length={8}
-                  value={Number(item.playerScore).toLocaleString()}
-                  timing={3}
-                />
+                {item.playerName}
+              </span>
+              <span
+                className={cx("score", {
+                  newScore: item.newScore,
+                })}
+              >
+                {Number(item.playerScore).toLocaleString()}
               </span>
             </React.Fragment>
           );
