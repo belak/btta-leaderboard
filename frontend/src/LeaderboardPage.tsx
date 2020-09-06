@@ -5,45 +5,11 @@ import React, {
   useRef,
   useCallback,
 } from "react";
-import camelcaseKeys from "camelcase-keys";
-import { parseISO, differenceInSeconds } from "date-fns";
 import cx from "classnames";
 import Mousetrap from "mousetrap";
 
-import { useInterval, useWindowSize, isHiDpi } from "./utils";
-
-const buildImageUrl = (url: string): string => {
-  if (!isHiDpi()) {
-    return url;
-  }
-
-  const split = url.split(".");
-  const ext = split.pop();
-  const baseName = split.join(".");
-
-  return ext ? `${baseName}@2x.${ext}` : url;
-};
-
-type ScoreResponse = {
-  id: number;
-  gameName: string;
-  gameBanner: string;
-  gameBannerThumbnail: string;
-  playerName: string;
-  playerScore: number;
-  created: string;
-  modified: string;
-};
-
-type Score = {
-  id: number;
-  gameName: string;
-  gameBanner: string;
-  gameBannerThumbnail: string;
-  playerName: string;
-  playerScore: number;
-  newScore: boolean;
-};
+import { useInterval, useWindowSize } from "./utils";
+import { useScores } from "./api";
 
 type LeaderboardProps = {
   baseURL: string;
@@ -55,56 +21,27 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   const [offset, setOffset] = useState(0);
   // Number on current page
   const [count, setCount] = useState(1);
-  // All score data
-  const [data, setData] = useState<Score[]>([]);
   // Refresh is disabled on mobile
   const [refreshEnabled, setRefreshEnabled] = useState(false);
 
+  const { data: scores, refresh: refreshScores, error } = useScores(baseURL);
+
+  // When scores are updated, preload all relevant images
+  useEffect(() => {
+    // Preload all images
+    scores.map(({ gameBannerThumbnail: src }) => {
+      let image = new Image();
+      image.src = src;
+      return image;
+    });
+  }, [scores])
+
+  // When the error state changes, propagate it up
+  useEffect(() => {
+    setError(error)
+  }, [error, setError])
+
   const scoresRef = useRef<HTMLDivElement>(null);
-
-  const refreshScores = useCallback(async () => {
-    try {
-      const resp = await fetch(`${baseURL}/api/scores/`);
-      if (resp.status === 200) {
-        const data = camelcaseKeys(await resp.json(), {
-          deep: true,
-        }) as ScoreResponse[];
-
-        const cur = new Date();
-
-        const newData = data.map((item) => {
-          const modified = parseISO(item.modified);
-          const created = parseISO(item.created);
-
-          const newScore = modified > created && differenceInSeconds(cur, modified) < 3600 * 24 * 30;
-          return {
-            ...item,
-            //newScore: Math.random() >= 0.8,
-            gameBannerThumbnail: buildImageUrl(item.gameBannerThumbnail),
-            newScore,
-          };
-        });
-
-        // Any score modified than a day ago should be counted as new.
-        setData(newData);
-
-        // Now that we had a successful request, clear any existing errors.
-        setError(null);
-
-        // Preload all images
-        newData.map(({ gameBannerThumbnail: src }) => {
-          let image = new Image();
-          image.src = src;
-          return image;
-        });
-      } else {
-        const text = await resp.text();
-        setError("Failed to get scores: " + text);
-      }
-    } catch (e) {
-      setError("Failed to get scores: " + e);
-    }
-  }, [baseURL, setData, setError]);
 
   const refreshScoresWrapped = useCallback(() => {
     // Unfortunately, the simplest way to handle disabling refreshing is to
@@ -119,33 +56,37 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   // Fetch new scores every 30 seconds
   useInterval(refreshScoresWrapped, 30000);
 
-  // Call fetchNewScores on the page load
-  useEffect(() => {
-    refreshScores();
-  }, [refreshScores]);
-
   const nextPage = useCallback(() => {
     const newOffset = offset + count;
-    const finalOffset = newOffset >= data.length ? 0 : newOffset;
+    const finalOffset = newOffset >= scores.length ? 0 : newOffset;
     if (finalOffset !== offset) {
       setOffset(finalOffset);
     }
-  }, [offset, count, data, setOffset]);
+  }, [offset, count, scores.length, setOffset]);
 
   // Jump to the next page every 9 seconds
-  useInterval(nextPage, 9000);
+  const resetNextPage = useInterval(nextPage, 9000);
 
   useEffect(() => {
-    Mousetrap.bind("space", nextPage);
-    Mousetrap.bind("enter", nextPage);
-    Mousetrap.bind("right", nextPage);
+    // Keybinds have a unique effect on nextPage - they reset the timer which
+    // automatically jumps to the next page. Without this, there is a strange
+    // behavior where you can arrow through pages and it will look like 2 were
+    // skipped at the same time.
+    const keybindNextPage = () => {
+      nextPage();
+      resetNextPage();
+    }
+
+    Mousetrap.bind("space", keybindNextPage);
+    Mousetrap.bind("enter", keybindNextPage);
+    Mousetrap.bind("right", keybindNextPage);
 
     return () => {
       Mousetrap.unbind("space");
       Mousetrap.unbind("enter");
       Mousetrap.unbind("right");
     };
-  }, [nextPage]);
+  }, [nextPage, resetNextPage]);
 
   // When the window size changes if we're not on mobile, reset it to displaying
   // 1 so we can properly figure out how many items to display.
@@ -169,7 +110,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
 
     // If we're on mobile, just display everything
     if (width < 1000) {
-      setCount(data.length);
+      setCount(scores.length);
       return;
     }
 
@@ -189,12 +130,12 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     if (count !== newCount) {
       setCount(newCount);
     }
-  }, [count, setCount, scoresRef, data, windowSize]);
+  }, [count, setCount, scoresRef, scores.length, windowSize]);
 
   return (
     <div className="scoresContainer" ref={scoresRef}>
       <div className="scores">
-        {data.slice(offset, offset + count).map((item, idx) => {
+        {scores.slice(offset, offset + count).map((item, idx) => {
           return (
             <React.Fragment key={item.id}>
               {idx !== 0 && <span className="line" />}

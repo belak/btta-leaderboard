@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 
-import Leaderboard from "./Leaderboard";
+import Leaderboard from "./LeaderboardPage";
 import { useLocalStorage } from "./utils";
 
 type FormData = {
@@ -81,10 +81,10 @@ function App() {
       {connected ? (
         <Leaderboard baseURL={url} setError={setError} />
       ) : (
-        <>
+        <form onSubmit={onSubmit}>
           URL: <input name="url" ref={register} />
-          <button onClick={onSubmit}>Connect</button>
-        </>
+          <button type="submit">Connect</button>
+        </form>
       )}
 
       <footer>

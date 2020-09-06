@@ -36,6 +36,15 @@ body {
   font-size: 20pt;
 }
 
+/*
+ * We need to mirror the flex settings for the App container so the hidden form
+ * looks better.
+ */
+form {
+  display: flex;
+  flex-direction: column;
+}
+
 header {
   text-align: center;
   display: inline-block;
@@ -147,6 +156,11 @@ footer img {
 .scores .score {
   justify-self: right;
   align-self: center;
+}
+
+.fullscreenImage {
+  height: auto;
+  width: auto;
 }
 
 /*

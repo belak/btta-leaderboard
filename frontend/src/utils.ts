@@ -1,24 +1,28 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 
-const useInterval = (fn: () => void, milliseconds: number) => {
+function useInterval(fn: () => void, milliseconds: number) {
   // NOTE: we use useRef here over useState for a few reasons - we don't want to
   // stop the ticking if the callback changes.
   const callback = useRef(fn);
+  const [trigger, setTrigger] = useState(false);
 
   // if the provided function changes, call it once and change its reference.
   useEffect(() => {
     callback.current = fn;
   }, [fn]);
 
-  // when the milliseconds change, reset the timeout
+  // when the milliseconds change or the trigger is called, reset the timeout.
   useEffect(() => {
     const interval = setInterval(() => {
       callback.current();
     }, milliseconds);
 
     return () => clearTimeout(interval);
-  }, [callback, milliseconds]);
-};
+  }, [callback, milliseconds, trigger]);
+
+  // Toggle the trigger when called in order to reset the interval.
+  return useCallback(() => setTrigger(!trigger), [trigger, setTrigger]);
+}
 
 function getSize() {
   const isClient = typeof window === "object";
@@ -120,4 +124,23 @@ function isRetina(): boolean {
   );
 }
 
-export { useInterval, useWindowSize, useLocalStorage, isRetina, isHiDpi };
+function buildImageUrl(url: string): string {
+  if (!isHiDpi()) {
+    return url;
+  }
+
+  const split = url.split(".");
+  const ext = split.pop();
+  const baseName = split.join(".");
+
+  return ext ? `${baseName}@2x.${ext}` : url;
+}
+
+export {
+  useInterval,
+  useWindowSize,
+  useLocalStorage,
+  isRetina,
+  isHiDpi,
+  buildImageUrl,
+};
