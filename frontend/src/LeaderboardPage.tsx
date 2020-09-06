@@ -9,14 +9,9 @@ import cx from "classnames";
 import Mousetrap from "mousetrap";
 
 import { useInterval, useWindowSize } from "./utils";
-import { useScores } from "./api";
+import useAPIState from "./useAPIState";
 
-type LeaderboardProps = {
-  baseURL: string;
-  setError: (err: string | null) => void;
-};
-
-function Leaderboard({ baseURL, setError }: LeaderboardProps) {
+const Leaderboard = () => {
   // Page offset
   const [offset, setOffset] = useState(0);
   // Number on current page
@@ -24,7 +19,10 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
   // Refresh is disabled on mobile
   const [refreshEnabled, setRefreshEnabled] = useState(false);
 
-  const { data: scores, refresh: refreshScores, error } = useScores(baseURL);
+  const {
+    state: { scores },
+    refreshScores,
+  } = useAPIState();
 
   // When scores are updated, preload all relevant images
   useEffect(() => {
@@ -34,12 +32,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
       image.src = src;
       return image;
     });
-  }, [scores])
-
-  // When the error state changes, propagate it up
-  useEffect(() => {
-    setError(error)
-  }, [error, setError])
+  }, [scores]);
 
   const scoresRef = useRef<HTMLDivElement>(null);
 
@@ -75,7 +68,7 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
     const keybindNextPage = () => {
       nextPage();
       resetNextPage();
-    }
+    };
 
     Mousetrap.bind("space", keybindNextPage);
     Mousetrap.bind("enter", keybindNextPage);
@@ -166,6 +159,6 @@ function Leaderboard({ baseURL, setError }: LeaderboardProps) {
       </div>
     </div>
   );
-}
+};
 
 export default Leaderboard;

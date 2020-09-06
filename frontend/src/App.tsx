@@ -1,68 +1,43 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useForm } from "react-hook-form";
+import React, { useState, useCallback, useRef } from "react";
 
 import Leaderboard from "./LeaderboardPage";
-import { useLocalStorage } from "./utils";
+import useAPIState from "./useAPIState";
 
 type FormData = {
   url: string;
 };
 
 function App() {
-  const { handleSubmit, register, setValue } = useForm<FormData>();
+  const urlInput = useRef<HTMLInputElement>(null);
 
-  // If an error occured
-  const [error, setError] = useState<string | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [url, setUrl] = useLocalStorage(
-    "leaderboardUrl",
-    "https://btta-api.elwert.cloud"
-  );
+  const { state, baseURL, setBaseURL } = useAPIState();
 
-  const onSubmit = useCallback(
-    handleSubmit(async (values: FormData) => {
-      localStorage.leaderboardUrl = values.url;
+  // If an error occured, we don't count as connected.
+  const [showForm, setShowForm] = useState(false);
 
-      setConnected(true);
-
-      fetch(`${values.url}/api/scores/`)
-        .then((resp) => {
-          // On successful connection, mark us as connected.
-          if (resp.status === 200) {
-            setError(null);
-            setUrl(values.url);
-          } else {
-            setError(`Unexpected status code: ${resp.status}`);
-          }
-        })
-        .catch((e) => {
-          setError(`Connection error: ${e}`);
-        });
-    }),
-    [handleSubmit, setUrl, setConnected]
-  );
-
-  const disconnect = useCallback(() => {
-    setConnected(false);
-
-    // We need to do this on the next animation frame rather than now so the
-    // form elements will exist.
-    window.requestAnimationFrame(() => {
-      setValue("url", url);
-    });
-  }, [setConnected, setValue, url]);
-
-  // On startup, if there's a provided URL, mark us as connected.
-  useEffect(() => {
-    if (url) {
-      setConnected(true);
+  const onSubmit = useCallback(() => {
+    if (urlInput.current) {
+      setBaseURL(urlInput.current.value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setShowForm(false);
+  }, [setShowForm, urlInput, setBaseURL]);
+
+  const onHeaderClick = useCallback(() => {
+    // Wait for the next animation frame and set the value
+    setShowForm(true);
+
+    window.requestAnimationFrame(() => {
+      if (!urlInput.current) {
+        throw Error("couldn't get input ref");
+      }
+
+      urlInput.current.value = baseURL;
+    });
+  }, [setShowForm, urlInput, baseURL]);
 
   const ret = (
     <div className="App">
-      <header onClick={disconnect}>
+      <header onClick={onHeaderClick}>
         <img className="logo" src="logo.png" alt="Back to the Arcade" />
         <img
           className="leaderboard"
@@ -71,18 +46,18 @@ function App() {
         />
       </header>
 
-      {error && (
+      {state.error && (
         <div>
           <h2>Error:</h2>
-          {error}
+          {state.error}
         </div>
       )}
 
-      {connected ? (
-        <Leaderboard baseURL={url} setError={setError} />
+      {!showForm ? (
+        <Leaderboard />
       ) : (
         <form onSubmit={onSubmit}>
-          URL: <input name="url" ref={register} />
+          URL: <input name="url" ref={urlInput} />
           <button type="submit">Connect</button>
         </form>
       )}

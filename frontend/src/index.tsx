@@ -6,10 +6,13 @@ import "normalize.css";
 import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
+import { APIProvider } from "./useAPIState";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <APIProvider>
+      <App />
+    </APIProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
