@@ -1,30 +1,64 @@
 import React, { useState, useCallback, useRef } from "react";
 
-import Leaderboard from "./LeaderboardPage";
+import LeaderboardPage from "./LeaderboardPage";
 import useAPIState from "./useAPIState";
+import ImagePage from "./ImagePage";
+import { useWindowSize, isMobile } from "./utils";
 
-type FormData = {
-  url: string;
-};
+type PageType = "form" | "leaderboard" | "images";
 
 function App() {
   const urlInput = useRef<HTMLInputElement>(null);
 
-  const { state, baseURL, setBaseURL } = useAPIState();
+  const {
+    state,
+    baseURL,
+    setBaseURL,
+    refreshImages,
+    refreshScores,
+  } = useAPIState();
 
-  // If an error occured, we don't count as connected.
-  const [showForm, setShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState<PageType>("images");
+
+  const windowSize = useWindowSize();
+  const onMobile = isMobile(windowSize);
+
+  const onFinished = useCallback(() => {
+    console.log("onFinished", currentPage);
+    switch (currentPage) {
+      case "form":
+        setCurrentPage("leaderboard");
+        break;
+      case "leaderboard":
+        setCurrentPage("images");
+        // After switching from the leaderboard, queue up a score refresh
+        if (!onMobile) {
+          refreshScores();
+        }
+        break;
+      case "images":
+        setCurrentPage("leaderboard");
+        // After switching from the images, queue up an image refresh
+        if (!onMobile) {
+          refreshImages();
+        }
+        break;
+      default:
+        setCurrentPage("leaderboard");
+        break;
+    }
+  }, [setCurrentPage, currentPage, refreshImages, refreshScores, onMobile]);
 
   const onSubmit = useCallback(() => {
     if (urlInput.current) {
       setBaseURL(urlInput.current.value);
     }
-    setShowForm(false);
-  }, [setShowForm, urlInput, setBaseURL]);
+    setCurrentPage("leaderboard");
+  }, [setCurrentPage, urlInput, setBaseURL]);
 
   const onHeaderClick = useCallback(() => {
     // Wait for the next animation frame and set the value
-    setShowForm(true);
+    setCurrentPage("form");
 
     window.requestAnimationFrame(() => {
       if (!urlInput.current) {
@@ -33,7 +67,11 @@ function App() {
 
       urlInput.current.value = baseURL;
     });
-  }, [setShowForm, urlInput, baseURL]);
+  }, [setCurrentPage, urlInput, baseURL]);
+
+  const onForm = currentPage === "form";
+  const onLeaderboard = !onMobile ? currentPage === "leaderboard" : !onForm;
+  const onImages = !onMobile ? currentPage === "images" : !onForm;
 
   const ret = (
     <div className="App">
@@ -53,14 +91,15 @@ function App() {
         </div>
       )}
 
-      {!showForm ? (
-        <Leaderboard />
-      ) : (
+      {onForm && (
         <form onSubmit={onSubmit}>
           URL: <input name="url" ref={urlInput} />
           <button type="submit">Connect</button>
         </form>
       )}
+
+      {onLeaderboard && <LeaderboardPage onFinished={onFinished} />}
+      {onImages && <ImagePage onFinished={onFinished} />}
 
       <footer>
         <img src="pacman-ghosts.jpg" alt="" />

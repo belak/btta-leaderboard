@@ -8,46 +8,34 @@ import React, {
 import cx from "classnames";
 import Mousetrap from "mousetrap";
 
-import { useInterval, useWindowSize } from "./utils";
+import { useInterval, useWindowSize, isMobile } from "./utils";
 import useAPIState from "./useAPIState";
 
-const Leaderboard = () => {
+const Leaderboard = ({ onFinished }: { onFinished: () => void }) => {
   // Page offset
   const [offset, setOffset] = useState(0);
   // Number on current page
   const [count, setCount] = useState(1);
-  // Refresh is disabled on mobile
-  const [refreshEnabled, setRefreshEnabled] = useState(false);
 
   const {
     state: { scores },
-    refreshScores,
   } = useAPIState();
 
   // When scores are updated, preload all relevant images
   useEffect(() => {
+    if (scores.length === 0) {
+      onFinished();
+    }
+
     // Preload all images
     scores.map(({ gameBannerThumbnail: src }) => {
       let image = new Image();
       image.src = src;
       return image;
     });
-  }, [scores]);
+  }, [scores, onFinished]);
 
   const scoresRef = useRef<HTMLDivElement>(null);
-
-  const refreshScoresWrapped = useCallback(() => {
-    // Unfortunately, the simplest way to handle disabling refreshing is to
-    // still tick, but not do anything.
-    if (!refreshEnabled) {
-      return;
-    }
-
-    refreshScores();
-  }, [refreshEnabled, refreshScores]);
-
-  // Fetch new scores every 30 seconds
-  useInterval(refreshScoresWrapped, 30000);
 
   const nextPage = useCallback(() => {
     const newOffset = offset + count;
@@ -55,7 +43,13 @@ const Leaderboard = () => {
     if (finalOffset !== offset) {
       setOffset(finalOffset);
     }
-  }, [offset, count, scores.length, setOffset]);
+
+    // When we're done cycling through the pages, it'll trigger onFinished and
+    // jump back to zero.
+    if (finalOffset === 0) {
+      onFinished();
+    }
+  }, [offset, count, scores.length, setOffset, onFinished]);
 
   // Jump to the next page every 9 seconds
   const resetNextPage = useInterval(nextPage, 9000);
@@ -85,14 +79,10 @@ const Leaderboard = () => {
   // 1 so we can properly figure out how many items to display.
   const windowSize = useWindowSize();
   useLayoutEffect(() => {
-    if (windowSize.width && windowSize.width > 1000) {
+    if (!isMobile(windowSize)) {
       setCount(1);
-      setRefreshEnabled(true);
-    } else {
-      // On mobile, disable the refresh.
-      setRefreshEnabled(false);
     }
-  }, [windowSize, setCount, setRefreshEnabled]);
+  }, [windowSize, setCount]);
 
   useLayoutEffect(() => {
     if (!scoresRef.current) {

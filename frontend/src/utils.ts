@@ -24,7 +24,12 @@ function useInterval(fn: () => void, milliseconds: number) {
   return useCallback(() => setTrigger(!trigger), [trigger, setTrigger]);
 }
 
-function getSize() {
+type WindowSize = {
+  width?: number;
+  height?: number;
+};
+
+function getSize(): WindowSize {
   const isClient = typeof window === "object";
 
   return {
@@ -33,7 +38,7 @@ function getSize() {
   };
 }
 
-function useWindowSize() {
+function useWindowSize(): WindowSize {
   const [windowSize, setWindowSize] = useState(getSize);
 
   useEffect(() => {
@@ -124,6 +129,11 @@ function isRetina(): boolean {
   );
 }
 
+function isMobile(size: WindowSize): boolean {
+  // Default to not mobile
+  return (size.width || 0) <= 1000;
+}
+
 function buildImageUrl(url: string): string {
   if (!isHiDpi()) {
     return url;
@@ -142,5 +152,6 @@ export {
   useLocalStorage,
   isRetina,
   isHiDpi,
+  isMobile,
   buildImageUrl,
 };
