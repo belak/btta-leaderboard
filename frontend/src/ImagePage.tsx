@@ -10,6 +10,15 @@ function ImagePage({ onFinished }: { onFinished: () => void }) {
   const [offset, setOffset] = useState(0);
 
   useEffect(() => {
+    // Preload all images
+    images.map(({ image: src }) => {
+      let image = new Image();
+      image.src = src;
+      return image;
+    });
+  }, [images]);
+
+  useEffect(() => {
     if (images.length <= offset) {
       onFinished();
     }
