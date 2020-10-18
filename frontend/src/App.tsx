@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 
 import LeaderboardPage from "./LeaderboardPage";
 import useAPIState from "./useAPIState";
@@ -19,12 +19,30 @@ function App() {
   } = useAPIState();
 
   const [currentPage, setCurrentPage] = useState<PageType>("images");
+  const [imageCounter, setImageCounter] = useState(0);
 
   const windowSize = useWindowSize();
   const onMobile = isMobile(windowSize);
 
+  const onNextPage = useCallback(() => {
+    // console.log("onNextPage", currentPage);
+
+    // For the most part, we ignore onNextPage, other than for images where we
+    // jump to the leaderboard.
+    switch (currentPage) {
+      case "images":
+        // After switching from the images, jump to the next image
+        setCurrentPage("leaderboard");
+        setImageCounter(imageCounter + 1);
+        break;
+      default:
+        break;
+    }
+  }, [setCurrentPage, currentPage, imageCounter, setImageCounter]);
+
   const onFinished = useCallback(() => {
-    console.log("onFinished", currentPage);
+    // console.log("onFinished", currentPage);
+
     switch (currentPage) {
       case "form":
         setCurrentPage("leaderboard");
@@ -37,8 +55,10 @@ function App() {
         }
         break;
       case "images":
+        // After switching from the images, jump to the next image and queue
+        // up an image refresh
         setCurrentPage("leaderboard");
-        // After switching from the images, queue up an image refresh
+        setImageCounter(0);
         if (!onMobile) {
           refreshImages();
         }
@@ -47,7 +67,14 @@ function App() {
         setCurrentPage("leaderboard");
         break;
     }
-  }, [setCurrentPage, currentPage, refreshImages, refreshScores, onMobile]);
+  }, [
+    setCurrentPage,
+    currentPage,
+    refreshImages,
+    refreshScores,
+    setImageCounter,
+    onMobile,
+  ]);
 
   const onSubmit = useCallback(() => {
     if (urlInput.current) {
@@ -72,6 +99,24 @@ function App() {
   const onForm = currentPage === "form";
   const onLeaderboard = !onMobile ? currentPage === "leaderboard" : !onForm;
   const onImages = !onMobile ? currentPage === "images" : !onForm;
+
+  const scoresLoaded = state.scores.length;
+  const imagesLoaded = state.images.length;
+
+  // This black magic is to avoid an error on startup where it will spin between
+  // pages while loading.
+  useEffect(() => {
+    // If they're both loaded or unloaded, we can't do anything, so bail early.
+    if (scoresLoaded === imagesLoaded) {
+      return;
+    }
+
+    if (currentPage === "leaderboard" && !scoresLoaded) {
+      setCurrentPage("images");
+    } else if (currentPage === "images" && !imagesLoaded) {
+      setCurrentPage("leaderboard");
+    }
+  }, [scoresLoaded, imagesLoaded, setCurrentPage, currentPage]);
 
   const ret = (
     <div className="App">
@@ -98,8 +143,16 @@ function App() {
         </form>
       )}
 
-      {onLeaderboard && <LeaderboardPage onFinished={onFinished} />}
-      {onImages && <ImagePage onFinished={onFinished} />}
+      {scoresLoaded && onLeaderboard && (
+        <LeaderboardPage onFinished={onFinished} onNextPage={onNextPage} />
+      )}
+      {imagesLoaded && onImages && (
+        <ImagePage
+          onFinished={onFinished}
+          onNextPage={onNextPage}
+          page={imageCounter}
+        />
+      )}
 
       <footer>
         <img src="pacman-ghosts.jpg" alt="" />

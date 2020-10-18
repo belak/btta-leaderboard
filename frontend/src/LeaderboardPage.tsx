@@ -11,7 +11,13 @@ import Mousetrap from "mousetrap";
 import { useInterval, useWindowSize, isMobile } from "./utils";
 import useAPIState from "./useAPIState";
 
-const Leaderboard = ({ onFinished }: { onFinished: () => void }) => {
+const Leaderboard = ({
+  onFinished,
+  onNextPage,
+}: {
+  onFinished: () => void;
+  onNextPage: () => void;
+}) => {
   // Page offset
   const [offset, setOffset] = useState(0);
   // Number on current page
@@ -48,8 +54,10 @@ const Leaderboard = ({ onFinished }: { onFinished: () => void }) => {
     // jump back to zero.
     if (finalOffset === 0) {
       onFinished();
+    } else {
+      onNextPage();
     }
-  }, [offset, count, scores.length, setOffset, onFinished]);
+  }, [offset, count, scores.length, setOffset, onFinished, onNextPage]);
 
   // Jump to the next page every 9 seconds
   const resetNextPage = useInterval(nextPage, 9000);

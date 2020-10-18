@@ -224,4 +224,8 @@ footer img {
     width: 90%;
     max-height: 500px;
   }
+
+  .imageContainer {
+    display: none;
+  }
 }

@@ -1,22 +1,35 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useEffect } from "react";
 import useAPIState from "./useAPIState";
-import { useInterval } from "./utils";
+import { isMobile, useInterval, useWindowSize } from "./utils";
 
-function ImagePage({ onFinished }: { onFinished: () => void }) {
+function ImagePage({
+  onFinished,
+  onNextPage,
+  page,
+}: {
+  onFinished: () => void;
+  onNextPage: () => void;
+  page: number;
+}) {
   const {
     state: { images },
   } = useAPIState();
 
-  const [offset, setOffset] = useState(0);
+  const windowSize = useWindowSize();
+  const onMobile = isMobile(windowSize);
 
   useEffect(() => {
-    // Preload all images
-    images.map(({ image: src }) => {
-      let image = new Image();
-      image.src = src;
-      return image;
-    });
-  }, [images]);
+    // Preload all images on desktop
+    if (!onMobile) {
+      images.map(({ image: src }) => {
+        let image = new Image();
+        image.src = src;
+        return image;
+      });
+    }
+  }, [images, onMobile]);
+
+  const offset = images.length ? page % images.length : 0;
 
   useEffect(() => {
     if (images.length <= offset) {
@@ -24,12 +37,8 @@ function ImagePage({ onFinished }: { onFinished: () => void }) {
     }
   }, [offset, images.length, onFinished]);
 
-  const nextPage = useCallback(() => {
-    setOffset(offset + 1);
-  }, [offset, setOffset]);
-
   // Jump to the next page every 9 seconds
-  const resetNextPage = useInterval(nextPage, 9000);
+  const resetNextPage = useInterval(onNextPage, 9000);
 
   useEffect(() => {
     // Keybinds have a unique effect on nextPage - they reset the timer which
@@ -37,7 +46,7 @@ function ImagePage({ onFinished }: { onFinished: () => void }) {
     // behavior where you can arrow through pages and it will look like 2 were
     // skipped at the same time.
     const keybindNextPage = () => {
-      nextPage();
+      onNextPage();
       resetNextPage();
     };
 
@@ -50,7 +59,7 @@ function ImagePage({ onFinished }: { onFinished: () => void }) {
       Mousetrap.unbind("enter");
       Mousetrap.unbind("right");
     };
-  }, [nextPage, resetNextPage]);
+  }, [onNextPage, resetNextPage]);
 
   const currentImage = images[offset];
 
