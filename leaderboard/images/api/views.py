@@ -11,4 +11,4 @@ class ImageViewSet(ListModelMixin, RetrieveModelMixin, GenericViewSet):
     permission_classes = []
 
     serializer_class = ImageSerializer
-    queryset = Image.objects.all()
+    queryset = Image.objects.filter(enabled=True)

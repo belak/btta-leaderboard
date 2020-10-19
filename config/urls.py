@@ -9,3 +9,7 @@ urlpatterns = [
     path("auth-token/", obtain_auth_token),
     path("admin/", admin.site.urls),
 ] + static(settings.MEDIA_PATH, document_root=settings.MEDIA_ROOT)
+
+
+# Unfortunately there isn't a great place to do this, so we do it here.
+admin.site.disable_action('delete_selected')
