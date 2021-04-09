@@ -32,12 +32,18 @@ function App() {
   }, [paused, setPaused]);
 
   useEffect(() => {
+    // We want to make sure "p" isn't bound when in the form so it doesn't
+    // conflict with text input.
+    if (currentPage === "form") {
+      return;
+    }
+
     Mousetrap.bind("p", togglePaused);
 
     return () => {
       Mousetrap.unbind("p");
     };
-  });
+  }, [togglePaused, currentPage]);
 
   const onNextPage = useCallback(() => {
     // console.log("onNextPage", currentPage);
