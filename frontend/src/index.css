@@ -186,6 +186,19 @@ footer img {
   overflow: auto;
 }
 
+.playPause {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  opacity: 1;
+}
+
+.fadeOut {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
+}
+
 /*
  * Overrides for small screens
  */

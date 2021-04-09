@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import Mousetrap from "mousetrap";
 
 function useInterval(fn: () => void, milliseconds: number) {
   // NOTE: we use useRef here over useState for a few reasons - we don't want to
@@ -146,10 +147,49 @@ function buildImageUrl(url: string): string {
   return ext ? `${baseName}@2x.${ext}` : url;
 }
 
+function useNextPage(
+  realOnNextPage: () => void,
+  paused: boolean,
+  timeout: number | undefined = 9000
+) {
+  const onNextPage = useCallback(() => {
+    if (paused) {
+      return;
+    }
+
+    realOnNextPage();
+  }, [realOnNextPage, paused]);
+
+  // Jump to the next page every 9 seconds
+  const resetNextPage = useInterval(onNextPage, timeout);
+
+  useEffect(() => {
+    // Keybinds have a unique effect on nextPage - they reset the timer which
+    // automatically jumps to the next page. Without this, there is a strange
+    // behavior where you can arrow through pages and it will look like 2 were
+    // skipped at the same time.
+    const keybindNextPage = () => {
+      realOnNextPage();
+      resetNextPage();
+    };
+
+    Mousetrap.bind("space", keybindNextPage);
+    Mousetrap.bind("enter", keybindNextPage);
+    Mousetrap.bind("right", keybindNextPage);
+
+    return () => {
+      Mousetrap.unbind("space");
+      Mousetrap.unbind("enter");
+      Mousetrap.unbind("right");
+    };
+  }, [resetNextPage, paused, realOnNextPage]);
+}
+
 export {
   useInterval,
   useWindowSize,
   useLocalStorage,
+  useNextPage,
   isRetina,
   isHiDpi,
   isMobile,

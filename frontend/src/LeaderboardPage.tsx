@@ -6,17 +6,18 @@ import React, {
   useCallback,
 } from "react";
 import cx from "classnames";
-import Mousetrap from "mousetrap";
 
-import { useInterval, useWindowSize, isMobile } from "./utils";
+import { useWindowSize, isMobile, useNextPage } from "./utils";
 import useAPIState from "./useAPIState";
 
 const Leaderboard = ({
   onFinished,
   onNextPage,
+  paused,
 }: {
   onFinished: () => void;
   onNextPage: () => void;
+  paused: boolean,
 }) => {
   // Page offset
   const [offset, setOffset] = useState(0);
@@ -59,29 +60,7 @@ const Leaderboard = ({
     }
   }, [offset, count, scores.length, setOffset, onFinished, onNextPage]);
 
-  // Jump to the next page every 9 seconds
-  const resetNextPage = useInterval(nextPage, 9000);
-
-  useEffect(() => {
-    // Keybinds have a unique effect on nextPage - they reset the timer which
-    // automatically jumps to the next page. Without this, there is a strange
-    // behavior where you can arrow through pages and it will look like 2 were
-    // skipped at the same time.
-    const keybindNextPage = () => {
-      nextPage();
-      resetNextPage();
-    };
-
-    Mousetrap.bind("space", keybindNextPage);
-    Mousetrap.bind("enter", keybindNextPage);
-    Mousetrap.bind("right", keybindNextPage);
-
-    return () => {
-      Mousetrap.unbind("space");
-      Mousetrap.unbind("enter");
-      Mousetrap.unbind("right");
-    };
-  }, [nextPage, resetNextPage]);
+  useNextPage(nextPage, paused);
 
   // When the window size changes if we're not on mobile, reset it to displaying
   // 1 so we can properly figure out how many items to display.

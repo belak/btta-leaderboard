@@ -1,5 +1,7 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 
+import { FaPause } from "react-icons/fa";
+
 import LeaderboardPage from "./LeaderboardPage";
 import useAPIState from "./useAPIState";
 import ImagePage from "./ImagePage";
@@ -18,11 +20,24 @@ function App() {
     refreshScores,
   } = useAPIState();
 
+  const [paused, setPaused] = useState(false);
   const [currentPage, setCurrentPage] = useState<PageType>("images");
   const [imageCounter, setImageCounter] = useState(0);
 
   const windowSize = useWindowSize();
   const onMobile = isMobile(windowSize);
+
+  const togglePaused = useCallback(() => {
+    setPaused(!paused);
+  }, [paused, setPaused]);
+
+  useEffect(() => {
+    Mousetrap.bind("p", togglePaused);
+
+    return () => {
+      Mousetrap.unbind("p");
+    };
+  });
 
   const onNextPage = useCallback(() => {
     // console.log("onNextPage", currentPage);
@@ -144,12 +159,17 @@ function App() {
       )}
 
       {scoresLoaded && onLeaderboard && (
-        <LeaderboardPage onFinished={onFinished} onNextPage={onNextPage} />
+        <LeaderboardPage
+          onFinished={onFinished}
+          onNextPage={onNextPage}
+          paused={paused}
+        />
       )}
       {imagesLoaded && onImages && (
         <ImagePage
           onFinished={onFinished}
           onNextPage={onNextPage}
+          paused={paused}
           page={imageCounter}
         />
       )}
@@ -157,6 +177,8 @@ function App() {
       <footer>
         <img src="pacman-ghosts.jpg" alt="" />
       </footer>
+
+      {paused && <FaPause className="playPause" />}
     </div>
   );
 

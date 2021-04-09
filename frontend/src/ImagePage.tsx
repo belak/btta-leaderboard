@@ -1,16 +1,18 @@
 import React, { useEffect } from "react";
 import useAPIState from "./useAPIState";
-import { isMobile, useInterval, useWindowSize } from "./utils";
+import { isMobile, useNextPage, useWindowSize } from "./utils";
 
-function ImagePage({
+const ImagePage = ({
   onFinished,
   onNextPage,
+  paused,
   page,
 }: {
   onFinished: () => void;
   onNextPage: () => void;
+  paused: boolean,
   page: number;
-}) {
+}) => {
   const {
     state: { images },
   } = useAPIState();
@@ -37,29 +39,7 @@ function ImagePage({
     }
   }, [offset, images.length, onFinished]);
 
-  // Jump to the next page every 9 seconds
-  const resetNextPage = useInterval(onNextPage, 9000);
-
-  useEffect(() => {
-    // Keybinds have a unique effect on nextPage - they reset the timer which
-    // automatically jumps to the next page. Without this, there is a strange
-    // behavior where you can arrow through pages and it will look like 2 were
-    // skipped at the same time.
-    const keybindNextPage = () => {
-      onNextPage();
-      resetNextPage();
-    };
-
-    Mousetrap.bind("space", keybindNextPage);
-    Mousetrap.bind("enter", keybindNextPage);
-    Mousetrap.bind("right", keybindNextPage);
-
-    return () => {
-      Mousetrap.unbind("space");
-      Mousetrap.unbind("enter");
-      Mousetrap.unbind("right");
-    };
-  }, [onNextPage, resetNextPage]);
+  useNextPage(onNextPage, paused);
 
   const currentImage = images[offset];
 
@@ -74,6 +54,6 @@ function ImagePage({
       )}
     </div>
   );
-}
+};
 
 export default ImagePage;
