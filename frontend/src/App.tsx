@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 
 import Mousetrap from "mousetrap";
-import { FaPause } from "react-icons/fa";
+import { FaPause, FaPlay } from "react-icons/fa";
 
 import LeaderboardPage from "./LeaderboardPage";
 import useAPIState from "./useAPIState";
@@ -185,7 +185,11 @@ function App() {
         <img src="pacman-ghosts.jpg" alt="" />
       </footer>
 
-      {paused && <FaPause className="playPause" />}
+      {paused ? (
+        <FaPause className="playPause" />
+      ) : (
+        <FaPlay className="playPause" />
+      )}
     </div>
   );
 
