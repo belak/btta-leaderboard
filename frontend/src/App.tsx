@@ -188,7 +188,7 @@ function App() {
       {paused ? (
         <FaPause className="playPause" />
       ) : (
-        <FaPlay className="playPause" />
+        <FaPlay className="playPause fadeOut" />
       )}
     </div>
   );

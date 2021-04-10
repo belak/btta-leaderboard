@@ -190,8 +190,11 @@ footer img {
   position: absolute;
   bottom: 0;
   right: 0;
-  opacity: 0;
+}
+
+.fadeOut {
   animation: fadeOut 3s;
+  animation-fill-mode: forwards;
 }
 
 @keyframes fadeOut {
