@@ -9,23 +9,44 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Score',
+            name="Score",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created', model_utils.fields.AutoCreatedField(default=django.utils.timezone.now, editable=False, verbose_name='created')),
-                ('modified', model_utils.fields.AutoLastModifiedField(default=django.utils.timezone.now, editable=False, verbose_name='modified')),
-                ('game_banner', models.ImageField(upload_to='')),
-                ('game_name', models.CharField(max_length=255)),
-                ('player_name', models.CharField(max_length=255)),
-                ('player_score', models.BigIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "created",
+                    model_utils.fields.AutoCreatedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="created",
+                    ),
+                ),
+                (
+                    "modified",
+                    model_utils.fields.AutoLastModifiedField(
+                        default=django.utils.timezone.now,
+                        editable=False,
+                        verbose_name="modified",
+                    ),
+                ),
+                ("game_banner", models.ImageField(upload_to="")),
+                ("game_name", models.CharField(max_length=255)),
+                ("player_name", models.CharField(max_length=255)),
+                ("player_score", models.BigIntegerField()),
             ],
             options={
-                'ordering': ['game_name'],
+                "ordering": ["game_name"],
             },
         ),
     ]

@@ -7,13 +7,13 @@ import sorl.thumbnail.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('scores', '0001_initial'),
+        ("scores", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='score',
-            name='game_banner',
-            field=sorl.thumbnail.fields.ImageField(upload_to=''),
+            model_name="score",
+            name="game_banner",
+            field=sorl.thumbnail.fields.ImageField(upload_to=""),
         ),
     ]

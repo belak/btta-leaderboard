@@ -8,4 +8,4 @@ class ScoreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Score
-        fields = '__all__'
+        fields = "__all__"
