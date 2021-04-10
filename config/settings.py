@@ -20,7 +20,7 @@ LANGUAGE_CODE = "en-us"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=[])
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
 APPEND_SLASH = False
 
 
@@ -32,9 +32,7 @@ DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
 
 # Caches
-CACHES = {
-    "default": env.cache("CACHE_URL", default="locmemcache://")
-}
+CACHES = {"default": env.cache("CACHE_URL", default="locmemcache://")}
 
 
 # URLs
@@ -114,7 +112,7 @@ MIDDLEWARE = [
 # Static
 STATIC_ROOT = str(ROOT_DIR / "static")
 STATIC_URL = "/static/"
-#STATICFILES_DIRS = [str(APPS_DIR / "static"), str(ROOT_DIR / "frontend" / "build")]
+# STATICFILES_DIRS = [str(APPS_DIR / "static"), str(ROOT_DIR / "frontend" / "build")]
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -122,8 +120,8 @@ STATICFILES_FINDERS = [
 
 
 # Media
-MEDIA_ROOT = env('MEDIA_ROOT', default=str(APPS_DIR / "media"))
-MEDIA_URL = env('MEDIA_URL', default="/media/")
+MEDIA_ROOT = env("MEDIA_ROOT", default=str(APPS_DIR / "media"))
+MEDIA_URL = env("MEDIA_URL", default="/media/")
 MEDIA_PATH = "/media/"
 
 
@@ -191,7 +189,7 @@ LOGGING = {
 
 
 # Thumbnails
-THUMBNAIL_FORMAT = 'JPEG'
+THUMBNAIL_FORMAT = "JPEG"
 THUMBNAIL_UPSCALE = False
 THUMBNAIL_ALTERNATIVE_RESOLUTIONS = [2]
 

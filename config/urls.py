@@ -12,4 +12,4 @@ urlpatterns = [
 
 
 # Unfortunately there isn't a great place to do this, so we do it here.
-admin.site.disable_action('delete_selected')
+admin.site.disable_action("delete_selected")
