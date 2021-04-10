@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
+import Mousetrap from "mousetrap";
 import { FaPause } from "react-icons/fa";
 
 import LeaderboardPage from "./LeaderboardPage";

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import useAPIState from "./useAPIState";
 import { isMobile, useNextPage, useWindowSize } from "./utils";
 
