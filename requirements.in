@@ -8,7 +8,7 @@ sorl-thumbnail<12.7
 whitenoise<5.1
 
 # Pillow is needed so ImageFields will work properly
-Pillow<9.0
+Pillow<10.0
 
 # argon2-cffi can speed up password hashing
 argon2-cffi<19.3
